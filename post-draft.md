@@ -16,17 +16,17 @@ Then you ask the machine for a sentence for one of them, and the machine refuses
 
 ## Demo
 
-Live: [PENDING]
+Live: [ofrenda.petrasynthetic.com](https://ofrenda.petrasynthetic.com/)
 
-Local: `ollama pull gemma4:e4b`, then `py -m http.server 3000`, then open `index.html`.
+The hosted page cannot reach your local model, so there the card is composed from your words without the model, and the page says so. For the full experience, with Gemma writing, run it on your machine: `ollama pull gemma4:e4b`, then `py -m http.server 3000`, then open `http://localhost:3000`.
 
-The hosted version shows the archive and the refusal without a model. The personal sentence needs Ollama on your machine, which is the point.
+Video of the full local run, including the model composing live: attached to this post.
 
 ## Code
 
-[PENDING: repository link]
+[github.com/Luis-Cwk/una-marca-mas](https://github.com/Luis-Cwk/una-marca-mas)
 
-`index.html` plus `datos.js`, generated from the official CSV. No framework, no build step, one font.
+`index.html` plus `datos.js`, generated from the official CSV. No framework, no build step, one font. The raw CSV and the Jalisco file with names are not in the repository, on purpose.
 
 ## How I Built It
 
