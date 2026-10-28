@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Una marca más · Petra</title>
+<meta name="description" content="133,887 registros de personas desaparecidas en México. Un modelo abierto escribe una sola frase con tus recuerdos. Después la sueltas y ya no se distingue.">
+<meta property="og:title" content="Una marca más · Petra">
+<meta property="og:description" content="133,887 registros. Una frase tuya. Después ya no se distingue.">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#000; --fg:#fff; --dim:rgba(255,255,255,.55); --faint:rgba(255,255,255,.32);
+  --rule:rgba(255,255,255,.16); --rule-strong:rgba(255,255,255,.32);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--fg)}
+body{font-family:'Space Grotesk',-apple-system,BlinkMacSystemFont,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+#field{position:fixed;inset:0;width:100%;height:100%;display:block;transform-origin:50% 70%;animation:breathe 26s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.018)}}
+#vig{position:fixed;inset:0;pointer-events:none;background:radial-gradient(120% 95% at 50% 50%, transparent 38%, rgba(0,0,0,.8) 100%)}
+#scrim{position:fixed;inset:0;pointer-events:none;z-index:3;background:#000;opacity:0;transition:opacity .9s ease}
+#scrim.on{opacity:.68}
+header{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:baseline;padding:22px 24px;z-index:5;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+header .brand{display:flex;gap:.3em;color:var(--fg);text-decoration:none;letter-spacing:.34em;font-size:12px;font-weight:500}
+#counter{position:fixed;top:22px;right:24px;z-index:6;font-size:11px;letter-spacing:.12em;color:var(--dim);font-variant-numeric:tabular-nums}
+header div{display:none}
+#counter b{color:var(--fg);font-weight:500;transition:color .4s}
+#counter b.flash{color:#fff;text-shadow:0 0 14px rgba(255,255,255,.9)}
+.stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:4;pointer-events:none}
+.panel{pointer-events:auto;width:min(640px,86vw);text-align:center;opacity:0;visibility:hidden;transform:translateY(10px);transition:opacity .7s ease,transform .7s ease,visibility .7s;position:absolute}
+.panel::before{content:"";position:absolute;inset:-60px -70px;z-index:-1;background:radial-gradient(closest-side,rgba(0,0,0,.82),rgba(0,0,0,.55) 60%,transparent);pointer-events:none}
+.panel.on{opacity:1;visibility:visible;transform:none}
+h1{font-size:clamp(30px,5.4vw,54px);font-weight:300;letter-spacing:-.03em;line-height:1.03;text-shadow:0 0 30px rgba(0,0,0,.9)}
+.lede{margin-top:20px;font-size:14px;color:var(--dim);max-width:46ch;margin-left:auto;margin-right:auto;text-shadow:0 0 24px rgba(0,0,0,.95)}
+.lede em{font-style:normal;color:var(--fg)}
+button{font-family:inherit;font-size:11px;letter-spacing:.18em;text-transform:uppercase;background:transparent;color:var(--fg);border:1px solid var(--rule-strong);padding:13px 26px;cursor:pointer;transition:background .2s,color .2s}
+button:hover{background:var(--fg);color:var(--bg)}
+button:disabled{opacity:.35;cursor:not-allowed;background:transparent;color:var(--fg)}
+button.solid{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+button.solid:hover{background:transparent;color:var(--fg)}
+.actions{margin-top:30px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.fields{display:grid;gap:18px;margin-top:28px;text-align:left}
+.fields .two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+label{display:block;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
+input,textarea{width:100%;background:transparent;border:0;border-bottom:1px solid var(--rule);color:var(--fg);font-family:inherit;font-size:14px;padding:6px 0;outline:none;resize:none;border-radius:0}
+input:focus,textarea:focus{border-bottom-color:var(--fg)}
+textarea{min-height:30px}
+#status{font-size:11px;color:var(--faint);margin-top:16px;min-height:16px}
+#sentence{font-size:clamp(21px,3.4vw,34px);font-weight:300;line-height:1.25;letter-spacing:-.01em;max-width:22ch;margin:0 auto}
+#dot{position:fixed;width:10px;height:10px;border-radius:50%;background:#fff;opacity:0;z-index:6;pointer-events:none}
+#silence{font-size:clamp(13px,1.6vw,15px);color:var(--dim);max-width:42ch;margin:26px auto 0;line-height:1.6}
+#silence b{color:var(--fg);font-weight:400}
+#uuid{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--faint);margin-top:16px;letter-spacing:.06em;word-break:break-all;white-space:pre-line}
+.small{font-size:11px;color:var(--faint)}
+.hidden{display:none !important}
+@media (max-width:640px){ .fields .two{grid-template-columns:1fr} header{padding:16px} #counter{top:16px;right:16px} #scrim.on{opacity:.82} }
+#printcard{display:none}
+@media print{
+  html,body{background:#fff;color:#000;overflow:visible;height:auto}
+  #field,#vig,header,#counter,.stage,#dot{display:none !important}
+  #printcard{display:block !important;padding:36px}
+}
+</style>
+</head>
+<body>
+<canvas id="field"></canvas>
+<div id="scrim"></div>
+<div id="vig"></div>
+
+<header>
+  <a class="brand" href="https://petrasynthetic.com/"><span>P</span><span>E</span><span>T</span><span>R</span><span>A</span></a>
+  <div>Una marca más</div>
+</header>
+<div id="counter"><b id="total">133,887</b> registros</div>
+
+<div class="stage">
+  <section class="panel on" id="p-intro">
+    <h1>Una marca más</h1>
+    <p class="lede">En México hay <em>133,887</em> personas desaparecidas o no localizadas en el registro oficial. Un tercio de esos registros está marcado como confidencial: sin nombre, sin fecha, solo un identificador.</p>
+    <p class="lede">Escribe tres recuerdos de alguien que murió. Un modelo abierto que corre en tu máquina escribe una sola frase con tus palabras. Después la sueltas en el archivo.</p>
+    <div class="actions"><button class="solid" id="start">Empezar</button></div>
+  </section>
+
+  <section class="panel" id="p-form">
+    <h1 style="font-size:clamp(22px,3.4vw,32px)">Tres recuerdos</h1>
+    <div class="fields">
+      <div class="two">
+        <div><label for="name">Nombre</label><input id="name" type="text" maxlength="40" placeholder="Elena" autocomplete="off"></div>
+        <div><label for="rel">Quién era para ti</label><input id="rel" type="text" maxlength="40" placeholder="mi abuela" autocomplete="off"></div>
+      </div>
+      <div><label for="m1">Recuerdo uno</label><textarea id="m1" rows="1" maxlength="160" placeholder="Hacía tortillas mientras cantaba rancheras"></textarea></div>
+      <div><label for="m2">Recuerdo dos</label><textarea id="m2" rows="1" maxlength="160" placeholder="Perdía los lentes y aparecían en el refri"></textarea></div>
+      <div><label for="m3">Recuerdo tres</label><textarea id="m3" rows="1" maxlength="160" placeholder="Me enseñó a remendar ropa"></textarea></div>
+    </div>
+    <div class="actions"><button class="solid" id="go">Encender</button><button id="demo">Ejemplo</button></div>
+    <p id="status"></p>
+  </section>
+
+  <section class="panel" id="p-sentence">
+    <div id="sentence"></div>
+    <p class="small" id="who" style="margin-top:18px"></p>
+    <div class="actions">
+      <button class="solid" id="release">Soltar en el archivo</button>
+      <button id="print">Imprimir tarjeta</button>
+    </div>
+    <p id="foot" class="small" style="margin-top:14px"></p>
+  </section>
+
+  <section class="panel" id="p-after">
+    <h1 style="font-size:clamp(22px,3.2vw,30px)">Ya es una marca más.</h1>
+    <p class="lede" style="margin-top:16px">El contador subió a <em id="afterTotal">133,888</em>. Tu frase está en la columna de 2026 y ya no se distingue de las demás.</p>
+    <p class="lede" style="margin-top:14px;color:var(--faint)">De ellos no hay frase. El archivo del Estado no guarda nombres: guarda un identificador, un año, una entidad y un estado.</p>
+    <div class="actions"><button id="ask">Pedir una frase por una de ellas</button><button id="restart">Otra memoria</button></div>
+    <p id="silence" class="hidden"></p>
+    <p id="uuid" class="hidden"></p>
+  </section>
+</div>
+
+<div id="dot"></div>
+<div id="printcard"></div>
+<script src="datos.js"></script>
+<script>
+const MODEL = "qwen3.5:4b";
+const HOST = "http://localhost:11434";
+const SYS = `Escribe UNA sola oracion de maximo 35 palabras en espanol de Mexico.
+Debe incluir, sin cambiar ni una palabra, al menos dos de las frases que te doy.
+Puedes agregar solo conectores: y, mientras, porque, aunque, todavia, cuando.
+Prohibido agregar cualquier otro contenido. Sin comillas, sin punto final extra.`;
+
+const $ = (id) => document.getElementById(id);
+const norm = (s) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").trim();
+const show = (id) => {
+  document.querySelectorAll(".panel").forEach((p) => p.classList.toggle("on", p.id === id));
+  $("scrim").classList.toggle("on", id !== "p-intro");
+};
+
+// ---------- el campo: una marca por registro ----------
+let landing = { x: 800, y: 600 };
+
+function buildField() {
+  const d = window.DATOS;
+  const W = window.innerWidth, H = window.innerHeight;
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const canvas = $("field");
+  canvas.width = Math.round(W * dpr);
+  canvas.height = Math.round(H * dpr);
+
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.fillStyle = "#000";
+  ctx.fillRect(0, 0, W, H);
+  if (!d) return;
+
+  const years = Object.keys(d.porAnio).map(Number).filter((y) => y > 0).sort((a, b) => a - b);
+  const base = H * 0.84;
+  const maxH = H * 0.52;
+  const left = W * 0.05;
+  const yearsRight = W * 0.74;
+  const colW = (yearsRight - left) / years.length;
+
+  const count = (y) => {
+    const c = d.porAnio[String(y)] || {};
+    return (c.DESAPARECIDA || 0) + (c["NO LOCALIZADA"] || 0) + (c.CONFIDENCIAL || 0);
+  };
+  const maxCount = years.reduce((m, y) => Math.max(m, count(y)), 1);
+
+  let seed = 20261026;
+  const rnd = () => (seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
+
+  const marks = [];
+  years.forEach((y, i) => {
+    const c = d.porAnio[String(y)] || {};
+    const x = left + (i + 0.5) * colW;
+    marks.push({ x, n: c.DESAPARECIDA || 0, a: 0.82 });
+    marks.push({ x, n: c["NO LOCALIZADA"] || 0, a: 0.4, offset: 2 });
+    marks.push({ x, n: c.CONFIDENCIAL || 0, a: 0.1, offset: 4 });
+  });
+
+  for (const m of marks) {
+    if (!m.n) continue;
+    const h = maxH * (m.n / maxCount);
+    const jitter = colW * 0.62;
+    ctx.fillStyle = `rgba(255,255,255,${m.a})`;
+    for (let k = 0; k < m.n; k++) {
+      const p = m.n > 1 ? k / (m.n - 1) : 0.5;
+      const x = m.x + (rnd() - 0.5) * jitter;
+      const y = base - p * h - (m.offset || 0) * Math.min(1, m.n / 400) + (rnd() - 0.5) * 2;
+      ctx.fillRect(x, y, 1, 1);
+    }
+  }
+
+  // bloque sin fecha: todas confidenciales
+  const conf = ((d.porAnio["0"] || {}).CONFIDENCIAL) || 0;
+  const bLeft = W * 0.79, bRight = W * 0.96;
+  if (conf) {
+    const h = maxH * 0.95;
+    ctx.fillStyle = "rgba(255,255,255,0.085)";
+    for (let k = 0; k < conf; k++) {
+      const p = k / (conf - 1);
+      const x = bLeft + rnd() * (bRight - bLeft);
+      const y = base - p * h + (rnd() - 0.5) * 2;
+      ctx.fillRect(x, y, 1, 1);
+    }
+  }
+
+  // eje y etiquetas
+  ctx.strokeStyle = "rgba(255,255,255,.14)";
+  ctx.beginPath();
+  ctx.moveTo(left - 6, base + 4.5);
+  ctx.lineTo(bRight, base + 4.5);
+  ctx.stroke();
+
+  ctx.fillStyle = "rgba(255,255,255,.32)";
+  ctx.font = "9px 'Space Grotesk', sans-serif";
+  let lastX = -99;
+  years.forEach((y, i) => {
+    if (y % 20 !== 0) return;
+    const x = left + (i + 0.5) * colW;
+    if (x - lastX < 34) return;
+    ctx.fillText(String(y), x - 9, base + 18);
+    lastX = x;
+  });
+  ctx.fillText("sin fecha", bLeft + 2, base + 18);
+  if (W > 700) ctx.fillText("2026", yearsRight + 4, base + 18);
+
+  landing = { x: yearsRight + 4, y: base - 3 };
+}
+window.addEventListener("resize", buildField);
+buildField();
+
+// ---------- modelo local ----------
+let online = false;
+async function probe() {
+  try {
+    const c = new AbortController();
+    const timer = setTimeout(() => c.abort(), 1500);
+    const r = await fetch(HOST + "/api/tags", { signal: c.signal });
+    clearTimeout(timer);
+    if (!r.ok) throw new Error(r.status);
+    const j = await r.json();
+    const names = (j.models || []).map((m) => m.name);
+    online = names.some((n) => n.startsWith(MODEL)) || names.some((n) => n.startsWith("qwen"));
+  } catch (e) {
+    online = false;
+  }
+  $("status").textContent = online ? "" : "No hay modelo local. La pieza funciona, pero la frase se arma sin modelo.";
+}
+
+async function ask(mems) {
+  const user = "Frases:\n" + mems.map((m, i) => `${i + 1}. ${m}`).join("\n");
+  const r = await fetch(HOST + "/api/chat", {
+    method: "POST", headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      model: MODEL, stream: false, think: false,
+      options: { temperature: 0.5, num_predict: 120 },
+      messages: [{ role: "system", content: SYS }, { role: "user", content: user }],
+    }),
+  });
+  if (!r.ok) throw new Error(r.status);
+  const j = await r.json();
+  return ((j.message && j.message.content) || "").trim().replace(/^["“]|["”]$/g, "").replace(/\.$/, "");
+}
+const grounded = (s, mems) => mems.filter((m) => norm(s).includes(norm(m))).length >= 2;
+
+let state = { mems: [], name: "", rel: "" };
+const input = () => ({
+  name: $("name").value.trim(),
+  rel: $("rel").value.trim(),
+  mems: [$("m1").value, $("m2").value, $("m3").value].map((s) => s.trim()).filter(Boolean),
+});
+
+// ---------- flujo ----------
+$("start").addEventListener("click", () => { show("p-form"); probe(); });
+
+$("demo").addEventListener("click", () => {
+  $("name").value = "Elena";
+  $("rel").value = "mi abuela";
+  $("m1").value = "Hacía tortillas mientras cantaba rancheras";
+  $("m2").value = "Perdía los lentes y aparecían en el refri";
+  $("m3").value = "Me enseñó a remendar ropa";
+});
+
+$("go").addEventListener("click", async () => {
+  const i = input();
+  if (i.mems.length < 2) { $("status").textContent = "Escribe al menos dos recuerdos."; return; }
+  state = i;
+  $("go").disabled = true;
+  $("status").textContent = online ? "Escribiendo una frase en tu máquina..." : "Armando la frase sin modelo...";
+  let text = "", ok = false;
+  if (online) {
+    for (let k = 0; k < 2 && !ok; k++) {
+      try { text = await ask(i.mems); ok = grounded(text, i.mems); } catch (e) {}
+    }
+  }
+  if (!ok) text = i.mems.slice(0, 2).join(", y ");
+  $("sentence").textContent = "";
+  $("who").textContent = [i.rel, i.name].filter(Boolean).join(" · ");
+  $("foot").textContent = ok
+    ? `Compuesta en esta máquina con ${MODEL}. Nada salió de aquí.`
+    : "Armada sin modelo, uniendo tus palabras.";
+  show("p-sentence");
+  type($("sentence"), text, 26);
+  $("go").disabled = false;
+  $("status").textContent = "";
+});
+
+// escritura lenta, como una voz que se arma
+function type(el, text, speed) {
+  let k = 0;
+  el.textContent = "";
+  const step = () => {
+    if (k > text.length) return;
+    el.textContent = text.slice(0, k);
+    k++;
+    setTimeout(step, speed);
+  };
+  step();
+}
+
+$("release").addEventListener("click", () => {
+  const dot = $("dot");
+  const W = window.innerWidth, H = window.innerHeight;
+  dot.style.transition = "none";
+  dot.style.left = W / 2 - 5 + "px";
+  dot.style.top = H / 2 - 5 + "px";
+  dot.style.width = "10px";
+  dot.style.height = "10px";
+  dot.style.opacity = "1";
+  show("");
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      dot.style.transition = "left 1.15s cubic-bezier(.55,.02,.3,1), top 1.15s cubic-bezier(.55,.02,.3,1), width .5s ease .65s, height .5s ease .65s, opacity .45s ease .85s";
+      dot.style.left = landing.x + "px";
+      dot.style.top = landing.y + "px";
+      dot.style.width = "2px";
+      dot.style.height = "2px";
+      dot.style.opacity = "0";
+    });
+  });
+  setTimeout(() => {
+    $("total").textContent = "133,888";
+    $("total").classList.add("flash");
+    setTimeout(() => $("total").classList.remove("flash"), 900);
+    $("afterTotal").textContent = "133,888";
+    show("p-after");
+  }, 1350);
+});
+
+$("ask").addEventListener("click", () => {
+  const e = (window.DATOS && window.DATOS.ejemplo) || null;
+  const s = $("silence"), u = $("uuid");
+  s.innerHTML = "No hay recuerdos que acomodar. De esta persona solo queda un registro: <b>un identificador, un año, una entidad y un estado</b>. La máquina no puede escribir por ella. Escribir sería inventarla.";
+  u.textContent = e ? `${e.id}\n${e.anio} · ${e.entidad} · ${e.estatus}\nsin nombre en el archivo del Estado` : "";
+  s.classList.remove("hidden");
+  u.classList.remove("hidden");
+});
+
+$("restart").addEventListener("click", () => {
+  $("total").textContent = "133,887";
+  show("p-form");
+});
+
+$("print").addEventListener("click", () => {
+  $("printcard").innerHTML = `<div style="font-family:'Space Grotesk',sans-serif;max-width:520px">
+    <div style="font-size:10px;letter-spacing:.18em;text-transform:uppercase">${state.rel || ""}</div>
+    <div style="font-size:26px;margin:6px 0 26px">${state.name || ""}</div>
+    <div style="font-size:20px;line-height:1.35">${$("sentence").textContent}</div>
+    <div style="margin-top:26px;padding-top:14px;border-top:1px solid #000;font-size:11px">${$("foot").textContent}</div>
+  </div>`;
+  window.print();
+});
+
+probe();
+</script>
+</body>
+</html>

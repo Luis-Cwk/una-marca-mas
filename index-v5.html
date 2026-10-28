@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Una marca más · Petra</title>
+<meta name="description" content="133,887 registros de personas desaparecidas en México, agrupados en manadas que flotan y responden. Un modelo abierto escribe una frase con tus recuerdos y después la sueltas.">
+<meta property="og:title" content="Una marca más · Petra">
+<meta property="og:description" content="133,887 registros. Una frase tuya. Después ya no se distingue.">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#050505;--fg:#fff;--dim:rgba(255,255,255,.58);--faint:rgba(255,255,255,.34);--rule:rgba(255,255,255,.16);--rule-strong:rgba(255,255,255,.34)}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:#050505;color:#fff}
+body{font-family:'Space Grotesk',-apple-system,BlinkMacSystemFont,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+#gl{position:fixed;inset:0;width:100%;height:100%;display:block;cursor:grab;touch-action:none}
+#gl.drag{cursor:grabbing}
+header{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:baseline;padding:22px 24px;z-index:5;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);pointer-events:none}
+header .brand{display:flex;gap:.3em;color:var(--fg);text-decoration:none;letter-spacing:.34em;font-size:12px;font-weight:500;pointer-events:auto}
+#counter{position:fixed;top:22px;right:24px;z-index:6;font-size:11px;letter-spacing:.12em;color:var(--dim);font-variant-numeric:tabular-nums}
+#counter b{color:var(--fg);font-weight:500;transition:color .4s,text-shadow .4s}
+#counter b.flash{color:#fff;text-shadow:0 0 16px #fff}
+#hint{position:fixed;left:24px;bottom:20px;z-index:5;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);transition:opacity .6s}
+#sound{position:fixed;right:24px;bottom:18px;z-index:6;background:none;border:1px solid var(--rule);color:var(--dim);font-family:inherit;font-size:10px;letter-spacing:.16em;text-transform:uppercase;padding:8px 12px;cursor:pointer}
+#sound:hover{color:var(--fg);border-color:var(--fg)}
+.stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:4;pointer-events:none}
+.panel{pointer-events:none;width:min(640px,86vw);text-align:center;opacity:0;visibility:hidden;transform:translateY(10px);transition:opacity .7s ease,transform .7s ease,visibility .7s;position:absolute}
+.panel button,.panel input,.panel textarea,.panel a{pointer-events:auto}
+.panel.on{opacity:1;visibility:visible;transform:none}
+.panel::before{content:"";position:absolute;inset:-70px -80px;z-index:-1;background:radial-gradient(closest-side,rgba(5,5,5,.88),rgba(5,5,5,.6) 62%,transparent);pointer-events:none}
+h1{font-size:clamp(30px,5.4vw,54px);font-weight:300;letter-spacing:-.03em;line-height:1.03;text-shadow:0 0 30px rgba(0,0,0,.9)}
+.lede{margin-top:20px;font-size:14px;color:var(--dim);max-width:46ch;margin-left:auto;margin-right:auto;text-shadow:0 0 22px rgba(0,0,0,.95)}
+.lede em{font-style:normal;color:var(--fg)}
+button{font-family:inherit;font-size:11px;letter-spacing:.18em;text-transform:uppercase;background:transparent;color:var(--fg);border:1px solid var(--rule-strong);padding:13px 26px;cursor:pointer;transition:background .2s,color .2s}
+button:hover{background:var(--fg);color:#000}
+button:disabled{opacity:.35;cursor:not-allowed;background:transparent;color:var(--fg)}
+button.solid{background:var(--fg);color:#000;border-color:var(--fg)}
+button.solid:hover{background:transparent;color:var(--fg)}
+.actions{margin-top:30px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.fields{display:grid;gap:18px;margin-top:28px;text-align:left}
+.fields .two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+label{display:block;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
+input,textarea{width:100%;background:transparent;border:0;border-bottom:1px solid var(--rule);color:var(--fg);font-family:inherit;font-size:14px;padding:6px 0;outline:none;resize:none;border-radius:0}
+input:focus,textarea:focus{border-bottom-color:var(--fg)}
+textarea{min-height:30px}
+#status{font-size:11px;color:var(--faint);margin-top:16px;min-height:16px}
+#sentence{font-size:clamp(21px,3.4vw,34px);font-weight:300;line-height:1.25;letter-spacing:-.01em;max-width:22ch;margin:0 auto;min-height:1.3em}
+#dot{position:fixed;width:10px;height:10px;border-radius:50%;background:#fff;opacity:0;z-index:6;pointer-events:none;box-shadow:0 0 18px rgba(255,255,255,.9)}
+#silence{font-size:clamp(13px,1.6vw,15px);color:var(--dim);max-width:42ch;margin:26px auto 0;line-height:1.6}
+#silence b{color:var(--fg);font-weight:400}
+#uuid{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--faint);margin-top:16px;word-break:break-all;white-space:pre-line}
+.small{font-size:11px;color:var(--faint)}
+.hidden{display:none !important}
+#poke{position:fixed;z-index:7;padding:6px 10px;border:1px solid var(--rule-strong);background:rgba(5,5,5,.85);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#fff;opacity:0;transform:translateY(6px);transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap}
+#poke.on{opacity:1;transform:none}
+#printcard{display:none}
+@media (max-width:640px){.fields .two{grid-template-columns:1fr}header{padding:16px}#counter{top:16px;right:16px}#hint{display:none}#sound{right:16px;bottom:14px}}
+@media print{html,body{background:#fff;color:#000;overflow:visible;height:auto}#gl,header,#counter,.stage,#dot,#hint,#poke,#sound{display:none!important}#printcard{display:block!important;padding:36px}}
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+
+<header>
+  <a class="brand" href="https://petrasynthetic.com/"><span>P</span><span>E</span><span>T</span><span>R</span><span>A</span></a>
+</header>
+<div id="counter"><b id="total">133,887</b> registros</div>
+<div id="hint">Arrastra para girar · rueda o pinza para acercarte · toca una manada</div>
+<button id="sound" aria-pressed="false">Sonido off</button>
+
+<div class="stage">
+  <section class="panel on" id="p-intro">
+    <h1>Una marca más</h1>
+    <p class="lede">En México hay <em>133,887</em> personas desaparecidas o no localizadas en el registro oficial. Un tercio está marcado como confidencial: sin nombre, sin fecha, solo un identificador.</p>
+    <p class="lede">Cada manada reúne registros del mismo año. Gira el espacio y toca una: verás lo único que el Estado guarda de esa persona.</p>
+    <div class="actions"><button class="solid" id="start">Empezar</button></div>
+  </section>
+
+  <section class="panel" id="p-form">
+    <h1 style="font-size:clamp(22px,3.4vw,32px)">Tres recuerdos</h1>
+    <div class="fields">
+      <div class="two">
+        <div><label for="name">Nombre</label><input id="name" type="text" maxlength="40" placeholder="Elena" autocomplete="off"></div>
+        <div><label for="rel">Quién era para ti</label><input id="rel" type="text" maxlength="40" placeholder="mi abuela" autocomplete="off"></div>
+      </div>
+      <div><label for="m1">Recuerdo uno</label><textarea id="m1" rows="1" maxlength="160" placeholder="Hacía tortillas mientras cantaba rancheras"></textarea></div>
+      <div><label for="m2">Recuerdo dos</label><textarea id="m2" rows="1" maxlength="160" placeholder="Perdía los lentes y aparecían en el refri"></textarea></div>
+      <div><label for="m3">Recuerdo tres</label><textarea id="m3" rows="1" maxlength="160" placeholder="Me enseñó a remendar ropa"></textarea></div>
+    </div>
+    <div class="actions"><button class="solid" id="go">Encender</button><button id="demo">Ejemplo</button></div>
+    <p id="status"></p>
+  </section>
+
+  <section class="panel" id="p-sentence">
+    <div id="sentence"></div>
+    <p class="small" id="who" style="margin-top:18px"></p>
+    <div class="actions">
+      <button class="solid" id="release">Soltar en el archivo</button>
+      <button id="print">Imprimir tarjeta</button>
+    </div>
+    <p id="foot" class="small" style="margin-top:14px"></p>
+  </section>
+
+  <section class="panel" id="p-after">
+    <h1 style="font-size:clamp(22px,3.2vw,30px)">Ya es una marca más.</h1>
+    <p class="lede" style="margin-top:16px">El contador subió a <em id="afterTotal">133,888</em>. Tu frase entró al archivo y ya no se distingue de las demás.</p>
+    <p class="lede" style="margin-top:14px;color:var(--faint)">De ellos no hay frase. Toca cualquier manada: el Estado solo devuelve un año, una entidad, un estado o la palabra confidencial.</p>
+    <div class="actions"><button id="restart">Otra memoria</button></div>
+    <p id="silence" class="hidden"></p>
+    <p id="uuid" class="hidden"></p>
+  </section>
+</div>
+
+<div id="dot"></div>
+<div id="poke"></div>
+<div id="printcard"></div>
+
+<script src="datos.js"></script>
+<script src="tone.js"></script>
+<script type="module">
+import * as THREE from "./three.module.min.js";
+
+const MODEL = "gemma4:e4b";
+const HOST = "http://localhost:11434";
+const SYS = `Escribe UNA sola oracion de maximo 35 palabras en espanol de Mexico.
+Debe incluir, sin cambiar ni una palabra, al menos dos de las frases que te doy.
+Puedes agregar solo conectores: y, mientras, porque, aunque, todavia, cuando.
+Prohibido agregar cualquier otro contenido. Sin comillas, sin punto final extra.`;
+
+const $ = (id) => document.getElementById(id);
+const norm = (s) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").trim();
+const show = (id) => document.querySelectorAll(".panel").forEach((p) => p.classList.toggle("on", p.id === id));
+
+// ---------------- escena ----------------
+const D = window.DATOS;
+const canvas = $("gl");
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false, powerPreference: "high-performance" });
+renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+renderer.setClearColor(0x050505, 1);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 4000);
+camera.position.set(0, 190, 430);
+
+const group = new THREE.Group();
+scene.add(group);
+
+const years = D ? Object.keys(D.porAnio).map(Number).filter((y) => y > 0).sort((a, b) => a - b) : [];
+const totalOf = (y) => {
+  const c = D.porAnio[String(y)] || {};
+  return (c.DESAPARECIDA || 0) + (c["NO LOCALIZADA"] || 0) + (c.CONFIDENCIAL || 0);
+};
+const maxCount = years.length ? years.reduce((m, y) => Math.max(m, totalOf(y)), 1) : 1;
+const COUNT = D ? D.total : 0;
+
+let seed = 20261026;
+const rnd = () => (seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
+
+const N = COUNT + 1;
+const offsets = new Float32Array(N * 3);      // posicion local dentro de la manada
+const centers = new Float32Array(N * 3);      // centro de la manada
+const flockSeeds = new Float32Array(N);
+const seeds = new Float32Array(N);
+const baseColor = new Float32Array(N * 3);
+const baseAlpha = new Float32Array(N);
+const baseSize = new Float32Array(N);
+const metaYear = new Uint8Array(N);
+const metaStatus = new Uint8Array(N);
+
+let p = 0;
+const put = (cx, cy, cz, ox, oy, oz, fs, r, g, b, a, s, yr, st) => {
+  centers[p * 3] = cx; centers[p * 3 + 1] = cy; centers[p * 3 + 2] = cz;
+  offsets[p * 3] = ox; offsets[p * 3 + 1] = oy; offsets[p * 3 + 2] = oz;
+  flockSeeds[p] = fs;
+  seeds[p] = rnd();
+  baseColor[p * 3] = r; baseColor[p * 3 + 1] = g; baseColor[p * 3 + 2] = b;
+  baseAlpha[p] = a;
+  baseSize[p] = s;
+  metaYear[p] = Math.max(0, Math.min(99, yr % 100));
+  metaStatus[p] = st;
+  p++;
+};
+
+const FLOCK = 200;
+
+// Anillos por anio: el radio crece con el tiempo. Las manadas se reparten en el anillo.
+function ring(n, radius, phase, w, r, g, b, a, s, yr, st) {
+  if (!n) return;
+  const k = Math.max(1, Math.ceil(n / FLOCK));
+  for (let f = 0; f < k; f++) {
+    const cnt = Math.min(FLOCK, n - f * FLOCK);
+    const ang = (f / k) * Math.PI * 2 + phase + (rnd() - 0.5) * 0.22;
+    const rad = radius + (rnd() - 0.5) * (4 + 16 * w);
+    const cx = Math.cos(ang) * rad;
+    const cz = Math.sin(ang) * rad;
+    const cy = (rnd() - 0.5) * (2 + 12 * w);
+    const fs = rnd();
+    const fr = 3.2 + 4.4 * w;
+    for (let j = 0; j < cnt; j++) {
+      const a2 = rnd() * Math.PI * 2;
+      const r2 = Math.sqrt(rnd()) * fr;
+      put(cx, cy, cz, Math.cos(a2) * r2, (rnd() - 0.5) * fr * 0.55, Math.sin(a2) * r2, fs, r, g, b, a, s, yr, st);
+    }
+  }
+}
+
+years.forEach((y, i) => {
+  const c = D.porAnio[String(y)] || {};
+  const prog = i / (years.length - 1);
+  const radius = 22 + 128 * prog;
+  const phase = i * 0.55;
+  const w = Math.sqrt(totalOf(y) / maxCount);
+  ring(c.DESAPARECIDA || 0, radius, phase, w, 1.0, 0.96, 0.9, 0.085, 3.0, y, 0);
+  ring(c["NO LOCALIZADA"] || 0, radius * 0.985, phase, w, 0.55, 0.62, 0.72, 0.075, 2.8, y, 1);
+});
+
+const confCount = (D.porAnio["0"] || {}).CONFIDENCIAL || 0;
+ring(confCount, 182, 0, 1.6, 0.5, 0.5, 0.55, 0.03, 3.4, 0, 2);
+
+// marca reservada: quien escribe
+const MARK = p;
+const MARK_POS = { x: Math.cos(0.6) * 202, y: 0, z: Math.sin(0.6) * 202 };
+put(MARK_POS.x, MARK_POS.y, MARK_POS.z, 0, 0, 0, 0, 0, 0, 0, 0, 2.4, 0, 0);
+
+const quadPos = new Float32Array([-0.5, -0.5, 0, 0.5, -0.5, 0, 0.5, 0.5, 0, -0.5, 0.5, 0]);
+const quadUv = new Float32Array([0, 0, 1, 0, 1, 1, 0, 1]);
+const geo = new THREE.InstancedBufferGeometry();
+geo.setAttribute("position", new THREE.Float32BufferAttribute(quadPos, 3));
+geo.setAttribute("uv", new THREE.Float32BufferAttribute(quadUv, 2));
+geo.setIndex(new THREE.BufferAttribute(new Uint16Array([0, 1, 2, 0, 2, 3]), 1));
+geo.instanceCount = N;
+geo.setAttribute("offset", new THREE.InstancedBufferAttribute(offsets, 3));
+geo.setAttribute("center", new THREE.InstancedBufferAttribute(centers, 3));
+geo.setAttribute("flockSeed", new THREE.InstancedBufferAttribute(flockSeeds, 1));
+geo.setAttribute("aSeed", new THREE.InstancedBufferAttribute(seeds, 1));
+geo.setAttribute("baseColor", new THREE.InstancedBufferAttribute(baseColor, 3));
+geo.setAttribute("aAlpha", new THREE.InstancedBufferAttribute(baseAlpha, 1));
+geo.setAttribute("aSize", new THREE.InstancedBufferAttribute(baseSize, 1));
+
+const uniforms = { uTime: { value: 0 }, uScale: { value: 1 } };
+
+const vertexShader = /* glsl */`
+precision highp float;
+attribute vec3 offset;
+attribute vec3 center;
+attribute float flockSeed;
+attribute float aSeed;
+attribute vec3 baseColor;
+attribute float aAlpha;
+attribute float aSize;
+uniform float uTime;
+uniform float uScale;
+varying vec3 vColor;
+varying float vAlpha;
+varying vec2 vUv;
+
+float hash(vec2 p){ return fract(sin(dot(p, vec2(12.9898,78.233))) * 43758.5453123); }
+float snoise(vec2 p){
+  vec2 i = floor(p); vec2 f = fract(p);
+  vec2 u = f*f*(3.0-2.0*f);
+  return mix(mix(hash(i), hash(i+vec2(1.0,0.0)), u.x),
+             mix(hash(i+vec2(0.0,1.0)), hash(i+vec2(1.0,1.0)), u.x), u.y) * 2.0 - 1.0;
+}
+
+void main(){
+  vUv = uv;
+  float t = uTime;
+
+  // la manada deriva y respira como un cuerpo
+  vec3 c = center;
+  c.x += snoise(vec2(flockSeed * 11.0, t * 0.085)) * 7.0;
+  c.z += snoise(vec2(flockSeed * 23.0, t * 0.075)) * 7.0;
+  c.y += snoise(vec2(flockSeed * 37.0, t * 0.10)) * 3.4;
+
+  // giro local de la manada
+  float ang = t * 0.13 + flockSeed * 6.283;
+  float ca = cos(ang), sa = sin(ang);
+  vec2 lo = vec2(offset.x * ca - offset.z * sa, offset.x * sa + offset.z * ca);
+
+  // temblor propio de cada registro
+  vec3 jit = vec3(
+    snoise(vec2(aSeed * 31.0, t * 0.5)),
+    snoise(vec2(aSeed * 17.0, t * 0.45)),
+    snoise(vec2(aSeed * 7.0, t * 0.4))
+  ) * 0.55;
+
+  vec3 pos = c + vec3(lo.x, offset.y, lo.y) + jit;
+
+  float breath = 1.0 + 0.18 * sin(t * (0.6 + flockSeed * 0.5) + aSeed * 6.283);
+  float size = aSize * uScale * breath * (0.7 + 0.6 * fract(aSeed * 43.123));
+
+  vec3 mv = (modelViewMatrix * vec4(pos, 1.0)).xyz;
+  mv.xy += position.xy * size;
+  gl_Position = projectionMatrix * vec4(mv, 1.0);
+
+  vColor = baseColor;
+  vAlpha = aAlpha * smoothstep(1600.0, 420.0, -mv.z);
+  if (aAlpha < 0.001) { gl_Position = vec4(2.0, 2.0, 2.0, 1.0); }
+}
+`;
+
+const fragmentShader = /* glsl */`
+precision mediump float;
+varying vec3 vColor;
+varying float vAlpha;
+varying vec2 vUv;
+void main(){
+  vec2 q = vUv - 0.5;
+  float r = length(q);
+  float a = smoothstep(0.5, 0.06, r) * vAlpha;
+  if (a < 0.004) discard;
+  gl_FragColor = vec4(vColor * (1.0 + 0.4 * (1.0 - r * 2.0)), a);
+}
+`;
+
+const mat = new THREE.ShaderMaterial({
+  uniforms, vertexShader, fragmentShader,
+  transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
+});
+const mesh = new THREE.Mesh(geo, mat);
+mesh.frustumCulled = false;
+group.add(mesh);
+
+// destello de la marca
+const flashCanvas = document.createElement("canvas");
+flashCanvas.width = flashCanvas.height = 128;
+const fctx = flashCanvas.getContext("2d");
+const grd = fctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+grd.addColorStop(0, "rgba(255,255,255,1)");
+grd.addColorStop(0.35, "rgba(255,255,255,.5)");
+grd.addColorStop(1, "rgba(255,255,255,0)");
+fctx.fillStyle = grd;
+fctx.fillRect(0, 0, 128, 128);
+const flash = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(flashCanvas), blending: THREE.AdditiveBlending, transparent: true, opacity: 0, depthWrite: false }));
+flash.position.set(MARK_POS.x, MARK_POS.y, MARK_POS.z);
+flash.scale.set(26, 26, 1);
+group.add(flash);
+
+function resize() {
+  const w = window.innerWidth, h = window.innerHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  camera.fov = w / h < 0.9 ? 70 : 58;
+  camera.updateProjectionMatrix();
+  uniforms.uScale.value = Math.max(0.85, Math.min(2.2, 820 / Math.max(320, w)));
+}
+window.addEventListener("resize", resize);
+resize();
+
+// ---------------- orbita y zoom ----------------
+const pointers = new Map();
+let dragging = false, px = 0, py = 0, rotY = 0, rotX = 0, rotYT = 0, rotXT = 0, moved = 0;
+let dist = 430, distT = 430, pinchStart = 0, pinchDist = 430;
+
+canvas.addEventListener("pointerdown", (e) => {
+  pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  canvas.setPointerCapture(e.pointerId);
+  if (pointers.size === 1) { dragging = true; px = e.clientX; py = e.clientY; moved = 0; canvas.classList.add("drag"); }
+  if (pointers.size === 2) {
+    const [a, b] = [...pointers.values()];
+    pinchStart = Math.hypot(a.x - b.x, a.y - b.y);
+    pinchDist = distT;
+  }
+});
+
+canvas.addEventListener("pointermove", (e) => {
+  if (!pointers.has(e.pointerId)) return;
+  pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+  if (pointers.size === 2) {
+    const [a, b] = [...pointers.values()];
+    const d = Math.hypot(a.x - b.x, a.y - b.y);
+    if (pinchStart > 0) distT = Math.min(1200, Math.max(170, pinchDist * (pinchStart / Math.max(1, d))));
+    return;
+  }
+  if (!dragging) return;
+  const dx = e.clientX - px, dy = e.clientY - py;
+  moved += Math.abs(dx) + Math.abs(dy);
+  rotYT += dx * 0.005;
+  rotXT = Math.max(-0.6, Math.min(0.6, rotXT + dy * 0.004));
+  px = e.clientX; py = e.clientY;
+});
+
+function endPointer(e) {
+  pointers.delete(e.pointerId);
+  if (pointers.size < 2) pinchStart = 0;
+  if (pointers.size === 0) {
+    canvas.classList.remove("drag");
+    dragging = false;
+    if (moved < 8) pokeAt(e.clientX, e.clientY);
+  }
+}
+canvas.addEventListener("pointerup", endPointer);
+canvas.addEventListener("pointercancel", endPointer);
+
+canvas.addEventListener("wheel", (e) => {
+  distT = Math.min(1200, Math.max(170, distT + e.deltaY * 0.5));
+}, { passive: true });
+
+// ---------------- tocar una manada ----------------
+const proj = new THREE.Vector3();
+function pokeAt(cx, cy) {
+  if (!D) return;
+  camera.updateMatrixWorld();
+  group.updateMatrixWorld();
+  let best = -1, bestD = 48 * 48;
+  for (let i = 0; i < N; i++) {
+    proj.set(centers[i * 3], centers[i * 3 + 1], centers[i * 3 + 2]).applyMatrix4(group.matrixWorld).project(camera);
+    if (proj.z > 1 || proj.z < -1) continue;
+    const sx = (proj.x * 0.5 + 0.5) * window.innerWidth;
+    const sy = (-proj.y * 0.5 + 0.5) * window.innerHeight;
+    const d = (sx - cx) * (sx - cx) + (sy - cy) * (sy - cy);
+    if (d < bestD) { bestD = d; best = i; }
+  }
+  const el = $("poke");
+  if (best < 0) { el.classList.remove("on"); return; }
+  const st = metaStatus[best];
+  const y = metaYear[best];
+  const year = y === 0 ? null : y < 30 ? 2000 + y : 1900 + y;
+  const when = st === 2 ? "confidencial · sin fecha" : st === 1 ? `${year} · no localizada` : `${year} · desaparecida`;
+  el.textContent = when;
+  el.style.left = Math.min(window.innerWidth - 210, cx + 14) + "px";
+  el.style.top = Math.max(40, cy - 34) + "px";
+  el.classList.add("on");
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove("on"), 2600);
+  blip(st);
+}
+
+// ---------------- audio: atmosfera generativa ----------------
+let audio = null, audioOn = false, mutateTimer = null;
+
+async function startAudio() {
+  if (audioOn) return;
+  try {
+    const T = window.Tone;
+    if (!T) return;
+    await T.start();
+
+    const master = new T.Gain(0).toDestination();
+    const verb = new T.Reverb({ decay: 15, wet: 0.82, preDelay: 0.08 }).connect(master);
+    const low = new T.Filter({ type: "lowpass", frequency: 380, Q: 0.8 }).connect(verb);
+    const grit = new T.Distortion({ distortion: 0.3, wet: 0.35 }).connect(low);
+
+    const notes = ["C1", "Eb1", "G1", "Bb1", "D2", "F2"];
+    const oscs = notes.map((n, i) => {
+      const o = new T.Oscillator({ frequency: T.Frequency(n).toFrequency() * (1 + (Math.random() - 0.5) * 0.004), type: i % 3 === 0 ? "sawtooth" : "sine" });
+      o.volume.value = -30 - i * 1.5;
+      o.detune.value = (Math.random() - 0.5) * 12;
+      o.connect(grit);
+      o.start();
+      return o;
+    });
+
+    const noise = new T.Noise("pink");
+    const nfil = new T.Filter({ type: "bandpass", frequency: 900, Q: 0.7 }).connect(grit);
+    noise.connect(nfil);
+    noise.volume.value = -38;
+    noise.start();
+
+    const lfoCut = new T.LFO({ frequency: 0.024, min: 140, max: 1100, type: "sine" }).connect(low.frequency).start();
+    const lfoQ = new T.LFO({ frequency: 0.011, min: 0.3, max: 2.4 }).connect(low.Q).start();
+
+    master.gain.rampTo(0.5, 10);
+    audio = { master, verb, low, oscs, noise, nfil, lfos: [lfoCut, lfoQ] };
+    audioOn = true;
+    $("sound").textContent = "Sonido on";
+    $("sound").setAttribute("aria-pressed", "true");
+
+    // mutaciones: la pieza nunca suena igual dos veces
+    const mutate = () => {
+      if (!audioOn || !audio) return;
+      const r = Math.random();
+      const now = T.now();
+      if (r < 0.35) {
+        const o = oscs[Math.floor(Math.random() * oscs.length)];
+        o.detune.rampTo((Math.random() - 0.5) * 26, 6);
+      } else if (r < 0.6) {
+        low.frequency.rampTo(180 + Math.random() * 900, 7);
+      } else if (r < 0.8) {
+        grit.wet.rampTo(0.15 + Math.random() * 0.5, 9);
+      } else {
+        noise.volume.rampTo(-46 + Math.random() * 12, 6);
+        nfil.frequency.rampTo(500 + Math.random() * 1800, 8);
+      }
+      mutateTimer = setTimeout(mutate, 7000 + Math.random() * 9000);
+    };
+    mutateTimer = setTimeout(mutate, 5000);
+  } catch (e) { /* sin audio si el navegador lo bloquea */ }
+}
+
+function stopAudio() {
+  if (!audio) return;
+  const T = window.Tone;
+  audioOn = false;
+  clearTimeout(mutateTimer);
+  try {
+    audio.master.gain.rampTo(0, 2);
+    setTimeout(() => {
+      audio.oscs.forEach((o) => o.stop());
+      audio.noise.stop();
+      audio.lfos.forEach((l) => l.stop());
+      audio.master.dispose(); audio.verb.dispose(); audio.low.dispose();
+      audio = null;
+    }, 2200);
+  } catch (e) {}
+  $("sound").textContent = "Sonido off";
+  $("sound").setAttribute("aria-pressed", "false");
+}
+
+// pequeno golpe cuando se toca una manada, con la nota del anio
+function blip(st) {
+  if (!audioOn || !audio) return;
+  try {
+    const T = window.Tone;
+    const f = st === 2 ? 62 : 90 + Math.random() * 120;
+    const s = new T.Synth({ oscillator: { type: "sine" }, envelope: { attack: 0.01, decay: 0.4, sustain: 0, release: 0.6 } }).connect(audio.verb);
+    s.volume.value = -22;
+    s.triggerAttackRelease(f, 0.12);
+    setTimeout(() => s.dispose(), 2500);
+  } catch (e) {}
+}
+
+$("sound").addEventListener("click", () => { audioOn ? stopAudio() : startAudio(); });
+
+// ---------------- loop ----------------
+const clock = new THREE.Clock();
+function loop() {
+  const t = clock.getElapsedTime();
+  uniforms.uTime.value = t;
+  rotY += (rotYT - rotY) * 0.06;
+  rotX += (rotXT - rotX) * 0.06;
+  dist += (distT - dist) * 0.07;
+  group.rotation.y = rotY + Math.sin(t * 0.05) * 0.015;
+  group.rotation.x = rotX + Math.sin(t * 0.07) * 0.008;
+  camera.position.set(0, 190 * (dist / 430), dist);
+  camera.lookAt(0, 0, 0);
+  if (flash.material.opacity > 0.002) {
+    flash.material.opacity *= 0.985;
+    flash.scale.multiplyScalar(1.01);
+  }
+  renderer.render(scene, camera);
+  requestAnimationFrame(loop);
+}
+loop();
+
+// ---------------- puente ----------------
+function anchorScreen() {
+  camera.updateMatrixWorld();
+  group.updateMatrixWorld();
+  proj.set(MARK_POS.x, MARK_POS.y, MARK_POS.z).applyMatrix4(group.matrixWorld).project(camera);
+  return { x: (proj.x * 0.5 + 0.5) * window.innerWidth, y: (-proj.y * 0.5 + 0.5) * window.innerHeight };
+}
+
+function lightMark() {
+  baseColor[MARK * 3] = 1; baseColor[MARK * 3 + 1] = 1; baseColor[MARK * 3 + 2] = 1;
+  baseAlpha[MARK] = 0.5;
+  baseSize[MARK] = 3.2;
+  geo.attributes.baseColor.needsUpdate = true;
+  geo.attributes.aAlpha.needsUpdate = true;
+  geo.attributes.aSize.needsUpdate = true;
+  flash.material.opacity = 1;
+  flash.scale.set(28, 28, 1);
+}
+
+// ---------------- modelo local ----------------
+let online = false;
+async function probe() {
+  try {
+    const c = new AbortController();
+    const timer = setTimeout(() => c.abort(), 1500);
+    const r = await fetch(HOST + "/api/tags", { signal: c.signal });
+    clearTimeout(timer);
+    if (!r.ok) throw new Error(r.status);
+    const j = await r.json();
+    const names = (j.models || []).map((m) => m.name);
+    online = names.some((n) => n.startsWith(MODEL.split(":")[0]));
+  } catch (e) { online = false; }
+  $("status").textContent = online ? "" : "No hay modelo local. La pieza funciona, pero la frase se arma sin modelo.";
+}
+
+async function ask(mems) {
+  const user = "Frases:\n" + mems.map((m, i) => `${i + 1}. ${m}`).join("\n");
+  const r = await fetch(HOST + "/api/chat", {
+    method: "POST", headers: { "content-type": "application/json" },
+    body: JSON.stringify({ model: MODEL, stream: false, think: false, options: { temperature: 0.5, num_predict: 120 }, messages: [{ role: "system", content: SYS }, { role: "user", content: user }] }),
+  });
+  if (!r.ok) throw new Error(r.status);
+  const j = await r.json();
+  return ((j.message && j.message.content) || "").trim().replace(/^["“]|["”]$/g, "").replace(/\.$/, "");
+}
+const grounded = (s, mems) => mems.filter((m) => norm(s).includes(norm(m))).length >= 2;
+
+let state = { mems: [], name: "", rel: "" };
+const input = () => ({
+  name: $("name").value.trim(),
+  rel: $("rel").value.trim(),
+  mems: [$("m1").value, $("m2").value, $("m3").value].map((s) => s.trim()).filter(Boolean),
+});
+
+function type(el, text, speed) {
+  let k = 0;
+  el.textContent = "";
+  const step = () => { if (k > text.length) return; el.textContent = text.slice(0, k); k++; setTimeout(step, speed); };
+  step();
+}
+
+$("start").addEventListener("click", () => { show("p-form"); probe(); startAudio(); });
+$("demo").addEventListener("click", () => {
+  $("name").value = "Elena";
+  $("rel").value = "mi abuela";
+  $("m1").value = "Hacía tortillas mientras cantaba rancheras";
+  $("m2").value = "Perdía los lentes y aparecían en el refri";
+  $("m3").value = "Me enseñó a remendar ropa";
+});
+
+$("go").addEventListener("click", async () => {
+  const i = input();
+  if (i.mems.length < 2) { $("status").textContent = "Escribe al menos dos recuerdos."; return; }
+  state = i;
+  $("go").disabled = true;
+  $("status").textContent = online ? "Escribiendo una frase en tu máquina..." : "Armando la frase sin modelo...";
+  let text = "", ok = false;
+  if (online) {
+    for (let k = 0; k < 2 && !ok; k++) {
+      try { text = await ask(i.mems); ok = grounded(text, i.mems); } catch (e) {}
+    }
+  }
+  if (!ok) text = i.mems.slice(0, 2).join(", y ");
+  $("who").textContent = [i.rel, i.name].filter(Boolean).join(" · ");
+  $("foot").textContent = ok ? `Compuesta en esta máquina con ${MODEL}. Nada salió de aquí.` : "Armada sin modelo, uniendo tus palabras.";
+  show("p-sentence");
+  type($("sentence"), text, 26);
+  $("go").disabled = false;
+  $("status").textContent = "";
+});
+
+$("release").addEventListener("click", () => {
+  const dot = $("dot");
+  const a = anchorScreen();
+  dot.style.transition = "none";
+  dot.style.left = window.innerWidth / 2 - 5 + "px";
+  dot.style.top = window.innerHeight / 2 - 5 + "px";
+  dot.style.width = "10px"; dot.style.height = "10px"; dot.style.opacity = "1";
+  show("");
+  $("hint").style.opacity = "0";
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    dot.style.transition = "left 1.15s cubic-bezier(.55,.02,.3,1), top 1.15s cubic-bezier(.55,.02,.3,1), width .5s ease .7s, height .5s ease .7s, opacity .4s ease .95s";
+    dot.style.left = a.x - 1 + "px";
+    dot.style.top = a.y - 1 + "px";
+    dot.style.width = "2px"; dot.style.height = "2px"; dot.style.opacity = "0";
+  }));
+  setTimeout(() => {
+    lightMark();
+    $("total").textContent = "133,888";
+    $("total").classList.add("flash");
+    setTimeout(() => $("total").classList.remove("flash"), 900);
+    $("afterTotal").textContent = "133,888";
+    show("p-after");
+    const e = D && D.ejemplo;
+    if (e) {
+      $("silence").innerHTML = "No hay recuerdos que acomodar. De esta persona solo queda un registro: <b>un identificador, un año, una entidad y un estado</b>.";
+      $("uuid").textContent = `${e.id}\n${e.anio} · ${e.entidad} · ${e.estatus}`;
+      $("silence").classList.remove("hidden");
+      $("uuid").classList.remove("hidden");
+    }
+  }, 1350);
+});
+
+$("restart").addEventListener("click", () => {
+  $("total").textContent = "133,887";
+  $("hint").style.opacity = "1";
+  show("p-form");
+});
+
+$("print").addEventListener("click", () => {
+  $("printcard").innerHTML = `<div style="font-family:'Space Grotesk',sans-serif;max-width:520px">
+    <div style="font-size:10px;letter-spacing:.18em;text-transform:uppercase">${state.rel || ""}</div>
+    <div style="font-size:26px;margin:6px 0 26px">${state.name || ""}</div>
+    <div style="font-size:20px;line-height:1.35">${$("sentence").textContent}</div>
+    <div style="margin-top:26px;padding-top:14px;border-top:1px solid #000;font-size:11px">${$("foot").textContent}</div>
+  </div>`;
+  window.print();
+});
+
+probe();
+</script>
+</body>
+</html>

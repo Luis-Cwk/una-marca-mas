@@ -1,0 +1,16 @@
+# Datos personales y fuente: nunca en el repo
+DesaparecidosMXFichas.xlsx
+data.csv
+*.xlsx
+*.csv
+*.eml
+perfil/
+Meta/
+
+# Basura local
+*.png
+*.mp4
+deploy/
+fix_encoding.mjs
+__pycache__/
+*.pyc
