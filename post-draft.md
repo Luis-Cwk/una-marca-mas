@@ -20,7 +20,9 @@ Live: [ofrenda.petrasynthetic.com](https://ofrenda.petrasynthetic.com/)
 
 The hosted page cannot reach your local model, so there the card is composed from your words without the model, and the page says so. For the full experience, with Gemma writing, run it on your machine: `ollama pull gemma4:e4b`, then `py -m http.server 3000`, then open `http://localhost:3000`.
 
-Video of the full local run, including the model composing live: attached to this post.
+The full local run, including the model composing live, with the card, the release and the counter reaching 133,888:
+
+{% embed https://www.youtube.com/watch?v=2c8q2enfbPo %}
 
 ## Code
 
